@@ -1,0 +1,3 @@
+Dataset/preprocessed_*.csv
+*.docx
+__pycache__/*
