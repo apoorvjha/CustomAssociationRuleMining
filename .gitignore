@@ -1,4 +1,4 @@
 Dataset/preprocessed_*.csv
-Dataset/feature_selection.csv
+Dataset/selected_features.csv
 *.docx
 __pycache__/*
