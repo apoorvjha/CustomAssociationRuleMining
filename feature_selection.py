@@ -41,12 +41,11 @@ def featureImportanceBasedSelection(data_path='./workspace/preprocessed_train.cs
         if (Y.nunique() < 2):
             print(f"{target_cols[i]} : {Y.nunique()}")
             continue
-        HPT=GridSearchCV(RandomForestClassifier(),{"n_estimators" : range(1,500,10)},n_jobs=-1,scoring=scorer,cv=5,verbose=1)
+        #HPT=GridSearchCV(RandomForestClassifier(),{"n_estimators" : range(1,500,10)},n_jobs=-1,scoring=scorer,cv=5,verbose=1)
+        HPT=RandomForestClassifier(n_estimators=100,n_jobs=-1)
         HPT.fit(X,Y)
-        print(f"Best parameter found for {target_cols[i]} is {HPT.best_params_}")
-        feature_importances=abs(array(HPT.best_estimator_.feature_importances_))
+        feature_importances=abs(array(HPT.feature_importances_))
         threshold=getThreshold(feature_importances)
-        #print(f"{target_cols[i]} Feature Importance stats => MIN : {min(feature_importances)}, MAX : {max(feature_importances)}, MEAN : {mean(feature_importances)}")
         if max(feature_importances) > threshold:
             features=array(features_under_consideration)[feature_importances > threshold]
         else:
