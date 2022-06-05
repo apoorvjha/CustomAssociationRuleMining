@@ -9,7 +9,7 @@ def read_data(path):
         return Exception()
 
 class Preprocessing:
-    def __init__(self,train_data_path='Dataset/train.csv',test_data_path='Dataset/test.csv'):
+    def __init__(self,train_data_path='dataset/train.csv',test_data_path='dataset/test.csv'):
         try:
             self.train_data=read_data(train_data_path)
             self.test_data=read_data(test_data_path)
@@ -118,7 +118,7 @@ class Preprocessing:
             elif self.test_data[col].dtype == 'object' and self.test_data[col].nunique() > 2:
                 dummies=get_dummies(self.test_data[col],prefix=col,drop_first=False)
                 self.test_data=concat([self.test_data,dummies],axis=1)
-    def savePreprocesedData(self,train_file_path='Dataset/preprocessed_train.csv',test_file_path='Dataset/preprocessed_test.csv'):
+    def savePreprocesedData(self,train_file_path='workspace/preprocessed_train.csv',test_file_path='workspace/preprocessed_test.csv'):
         self.train_data.to_csv(train_file_path,index=False)
         self.test_data.to_csv(test_file_path,index=False)
 def test():
