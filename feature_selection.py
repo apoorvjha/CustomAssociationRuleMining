@@ -1,6 +1,6 @@
 from pandas import read_csv,read_excel,DataFrame
 from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import Lasso
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import average_precision_score,make_scorer
 from numpy import linspace,abs,mean,where,array
@@ -12,7 +12,7 @@ def read_data(path):
     if path.endswith('.csv'):
         return read_csv(path)
     elif path.endswith('.xslx'):
-        return read_csv(path)
+        return read_excel(path)
     else:
         return Exception()
 
@@ -24,9 +24,9 @@ def prepareLists(data,exclusion_set=['Customer_ID','Product_Holding_B1','Product
 
 def getThreshold(feature_importances):
     # Create a non Naive threshold strategy.
-    return 0
+    return mean(feature_importances)
 
-def lassoBasedSelection(data_path='./Dataset/preprocessed_train.csv'):
+def featureImportanceBasedSelection(data_path='./workspace/preprocessed_train.csv'):
     try:
         data=read_data(data_path)
     except:
@@ -38,12 +38,13 @@ def lassoBasedSelection(data_path='./Dataset/preprocessed_train.csv'):
     X=scaler.fit_transform(data[features_under_consideration])
     for i in range(len(target_cols)):
         Y=data[target_cols[i]]
-        #HPT=GridSearchCV(Lasso(),{"alpha" : linspace(0.1,0.5,num=1000)},n_jobs=-1,scoring=scorer,cv=5,verbose=1)
-        HPT=Lasso(alpha=0.1)
+        if (Y.nunique() < 2):
+            print(f"{target_cols[i]} : {Y.nunique()}")
+            continue
+        HPT=GridSearchCV(RandomForestClassifier(),{"n_estimators" : range(1,500,10)},n_jobs=-1,scoring=scorer,cv=5,verbose=1)
         HPT.fit(X,Y)
-        #print(f"Best parameter found for {target_cols[i]} is {HPT.best_params_}")
-        #feature_importances=abs(array(HPT.best_estimator_.coef_))
-        feature_importances=abs(array(HPT.coef_))
+        print(f"Best parameter found for {target_cols[i]} is {HPT.best_params_}")
+        feature_importances=abs(array(HPT.best_estimator_.feature_importances_))
         threshold=getThreshold(feature_importances)
         #print(f"{target_cols[i]} Feature Importance stats => MIN : {min(feature_importances)}, MAX : {max(feature_importances)}, MEAN : {mean(feature_importances)}")
         if max(feature_importances) > threshold:
@@ -54,12 +55,12 @@ def lassoBasedSelection(data_path='./Dataset/preprocessed_train.csv'):
     return selected_features
 
 def test():
-    selected=lassoBasedSelection()
+    selected=featureImportanceBasedSelection()
     max_length=max([len(selected[i]) for i in selected.keys()])
     for i in selected.keys():
         if len(selected[i]) < max_length:
             selected[i].extend(list(['' for j in range(max_length - len(selected[i]))]))
-    DataFrame(selected).to_csv('./Dataset/selected_features.csv',index=False)
+    DataFrame(selected).to_csv('./workspace/selected_features.csv',index=False)
 
 if __name__=='__main__':
     test()
