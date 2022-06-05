@@ -1,4 +1,5 @@
-Dataset/preprocessed_*.csv
-Dataset/selected_features.csv
+workspace/*.csv
+models/*.pkl
+output/*.csv
 *.docx
 __pycache__/*
