@@ -1,6 +1,7 @@
 import preprocessing
 import feature_selection
 import model
+from pandas import DataFrame
 
 preprocessor=preprocessing.Preprocessing()
 preprocessor.handleMissingData()
